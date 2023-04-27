@@ -38,7 +38,9 @@ const OHRIDropdown: React.FC<OHRIFormFieldProps> = ({ question, onChange, handle
     return answer?.label;
   };
   useEffect(() => {
-    setItems(question.questionOptions.answers.map(item => item.value || item.concept));
+    setItems(
+      question.questionOptions.answers.filter(answer => !answer.isHidden).map(item => item.value || item.concept),
+    );
   }, [question.questionOptions.answers]);
 
   useEffect(() => {
