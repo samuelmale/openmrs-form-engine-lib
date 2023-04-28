@@ -5,6 +5,7 @@ import { EncounterContext, OHRIFormContext } from '../../../ohri-form-context';
 import OHRIDropdown from './ohri-dropdown.component';
 import { OHRIFormField } from '../../../api/types';
 import { ObsSubmissionHandler } from '../../../submission-handlers/base-handlers';
+import { OHRIForm } from '../../..';
 
 const question: OHRIFormField = {
   label: 'Patient past program.',

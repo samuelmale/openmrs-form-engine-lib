@@ -1,4 +1,4 @@
-import { render, fireEvent, screen, cleanup, act } from '@testing-library/react';
+import { render, fireEvent, screen, cleanup, act, getByText } from '@testing-library/react';
 import { when } from 'jest-when';
 import React from 'react';
 import OHRIForm from './ohri-form.component';
@@ -6,6 +6,7 @@ import hts_poc_1_1 from '../__mocks__/packages/hiv/forms/hts_poc/1.1.json';
 import bmi_form from '../__mocks__/forms/ohri-forms/bmi-test-form.json';
 import bsa_form from '../__mocks__/forms/ohri-forms/bsa-test-form.json';
 import edd_form from '../__mocks__/forms/ohri-forms/edd-test-form.json';
+import answer_options_form from '../__mocks__/forms/ohri-forms/answer-options-test-form.json';
 import next_visit_form from '../__mocks__/forms/ohri-forms/next-visit-test-form.json';
 import months_on_art_form from '../__mocks__/forms/ohri-forms/months-on-art-form.json';
 import age_validation_form from '../__mocks__/forms/ohri-forms/age-validation-form.json';
@@ -256,6 +257,23 @@ describe('OHRI Forms:', () => {
       await act(async () => expect(enrollmentDate.value).toBe('7/6/1975'));
       await act(async () => expect(mrn.value).toBe(''));
       await act(async () => expect(mrn).toBeVisible());
+    });
+
+    it('should hide answer options based some rule', async () => {
+      //setup
+      await act(async () => renderForm(null, answer_options_form));
+      const testCountField = await findNumberInput(screen, 'test_count');
+      //const dropdownWidget = screen.getByRole('button', { name: /Testing Recommendations/ });
+
+      // assert initial values
+
+      await act(async () => expect(testCountField.value).toBe(''));
+
+      fireEvent.blur(testCountField, { target: { value: '2' } });
+      // expect(getByText('Perfect testing')).toBeInTheDocument();
+      // expect(getByText('Minimal testing')).toBeInTheDocument();
+      // expect(getByText('Not ideal')).toBeInTheDocument();
+      // expect(getByText('Un-decisive')).toBeInTheDocument();
     });
 
     it('Should load initial value from external arbitrary data source', async () => {
