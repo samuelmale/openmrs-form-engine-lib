@@ -131,6 +131,37 @@ describe('OHRI Forms:', () => {
     // TODO: Fillup test suite
   });
 
+  describe('Answer Options', () => {
+    it('should render dropdown with all options when test count input is empty', async () => {
+      //setup
+      await act(async () => renderForm(null, answer_options_form));
+      const testCountField = await findNumberInput(screen, 'How many times have you tested in the past?');
+      const recommendationDropdown = await findSelectInput(screen, 'Testing Recommendations');
+
+      // assert initial values
+      await act(async () => expect(testCountField.value).toBe(''));
+      fireEvent.click(recommendationDropdown);
+
+      expect(screen.getByText('Perfect testing')).toBeInTheDocument();
+      expect(screen.getByText('Minimal testing')).toBeInTheDocument();
+      expect(screen.getByText('Un-decisive')).toBeInTheDocument();
+      expect(screen.getByText('Not ideal')).toBeInTheDocument();
+    });
+
+    it('should render dropdown with with 2 options hidden if count input value is greater than 5', async () => {
+      //setup
+      await act(async () => renderForm(null, answer_options_form));
+      const testCountField = await findNumberInput(screen, 'How many times have you tested in the past?');
+      const recommendationDropdown = await findSelectInput(screen, 'Testing Recommendations');
+
+      fireEvent.blur(testCountField, { target: { value: '6' } });
+      fireEvent.click(recommendationDropdown);
+
+      expect(screen.getByText('Perfect testing')).not.toBeInTheDocument();
+      expect(screen.getByText('Minimal testing')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Calcuated values', () => {
     afterEach(() => {
       cleanup();
@@ -257,23 +288,6 @@ describe('OHRI Forms:', () => {
       await act(async () => expect(enrollmentDate.value).toBe('7/6/1975'));
       await act(async () => expect(mrn.value).toBe(''));
       await act(async () => expect(mrn).toBeVisible());
-    });
-
-    it('should hide answer options based some rule', async () => {
-      //setup
-      await act(async () => renderForm(null, answer_options_form));
-      const testCountField = await findNumberInput(screen, 'test_count');
-      //const dropdownWidget = screen.getByRole('button', { name: /Testing Recommendations/ });
-
-      // assert initial values
-
-      await act(async () => expect(testCountField.value).toBe(''));
-
-      fireEvent.blur(testCountField, { target: { value: '2' } });
-      // expect(getByText('Perfect testing')).toBeInTheDocument();
-      // expect(getByText('Minimal testing')).toBeInTheDocument();
-      // expect(getByText('Not ideal')).toBeInTheDocument();
-      // expect(getByText('Un-decisive')).toBeInTheDocument();
     });
 
     it('Should load initial value from external arbitrary data source', async () => {
