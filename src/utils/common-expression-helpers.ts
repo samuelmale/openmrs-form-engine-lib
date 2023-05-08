@@ -85,6 +85,7 @@ export class CommonExpressionHelpers {
   };
 
   useFieldValue = (questionId: string) => {
+    console.log('finding field with id ' + questionId + ' in ' + this.allFieldValues);
     if (this.allFieldsKeys.includes(questionId)) {
       return this.allFieldValues[questionId];
     }

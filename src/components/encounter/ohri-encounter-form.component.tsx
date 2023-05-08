@@ -184,6 +184,19 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
               },
             );
           }
+          const limitExpression = field.questionOptions.repeatOptions?.limitExpression;
+          if (field.questionOptions.rendering === 'repeating' && !isEmpty(limitExpression)) {
+            field.questionOptions.repeatOptions.limit = evaluateExpression(
+              limitExpression,
+              { value: field, type: 'field' },
+              flattenedFields,
+              tempInitialValues,
+              {
+                mode: sessionMode,
+                patient,
+              },
+            );
+          }
           return field;
         }),
       );
@@ -452,6 +465,9 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
     if (field.questionOptions.rendering == 'toggle') {
       value = value ? ConceptTrue : ConceptFalse;
     }
+    if (field.id == 'repeatLimitField') {
+      console.log({ value, field });
+    }
     if (field.fieldDependants) {
       field.fieldDependants.forEach(dep => {
         const dependant = fields.find(f => f.id == dep);
@@ -492,6 +508,34 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
           );
         }
 
+        if (
+          dependant.questionOptions.rendering === 'repeating' &&
+          !isEmpty(dependant.questionOptions.repeatOptions?.limitExpression)
+        ) {
+          console.log('limit expression', dependant.questionOptions.repeatOptions?.limitExpression);
+          dependant.questionOptions.repeatOptions.limit = evaluateExpression(
+            dependant.questionOptions.repeatOptions?.limitExpression,
+            { value: dependant, type: 'field' },
+            fields,
+            { ...values, [fieldName]: value },
+            {
+              mode: sessionMode,
+              patient,
+            },
+          );
+          console.log({
+            expressionResult: evaluateExpression(
+              dependant.questionOptions.repeatOptions?.limitExpression,
+              { value: dependant, type: 'field' },
+              fields,
+              { ...values, [fieldName]: value },
+              {
+                mode: sessionMode,
+                patient,
+              },
+            ),
+          });
+        }
         let fields_temp = [...fields];
         const index = fields_temp.findIndex(f => f.id == dep);
         fields_temp[index] = dependant;

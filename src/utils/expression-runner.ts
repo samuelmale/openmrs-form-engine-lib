@@ -23,6 +23,9 @@ export function evaluateExpression(
   if (!expression?.trim()) {
     return null;
   }
+  if (expression == 'useFieldValue(repeatLimitField)') {
+    console.log({ expression, node, fields, fieldValues, context });
+  }
   const allFieldsKeys = fields.map(f => f.id);
   const parts = parseExpression(expression.trim());
   // register dependencies
