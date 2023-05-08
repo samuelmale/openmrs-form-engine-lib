@@ -80,7 +80,9 @@ const OHRIDropdown: React.FC<OHRIFormFieldProps> = ({ question, onChange, handle
             id={question.id}
             titleText={question.label}
             label="Choose an option"
-            items={items}
+            items={question.questionOptions.answers
+              .filter(answer => !answer.isHidden)
+              .map(item => item.value || item.concept)}
             itemToString={itemToString}
             selectedItem={field.value}
             onChange={({ selectedItem }) => handleChange(selectedItem)}

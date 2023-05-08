@@ -62,6 +62,7 @@ export function evaluateExpression(
   expression = linkReferencedFieldValues(fields, fieldValues, parts);
 
   try {
+    console.log({expression, result: eval(expression)})
     return eval(expression);
   } catch (error) {
     console.error(`Error: ${error} \n\n failing expression: ${expression}`);

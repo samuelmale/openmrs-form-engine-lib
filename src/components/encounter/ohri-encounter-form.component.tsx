@@ -498,7 +498,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
             answer.isHidden = evaluateExpression(
               answer.hide.hideWhenExpression,
               { value: dependant, type: 'field' },
-              flattenedFields,
+              fields,
               values,
               {
                 mode: sessionMode,
