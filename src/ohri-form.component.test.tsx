@@ -153,31 +153,29 @@ describe('OHRI Forms:', () => {
       expect(undeciciveOption).toBeInTheDocument();
     });
 
-    fit('should render dropdown with with 2 options hidden if count input value is greater than 5', async () => {
+    it('should render dropdown with with 2 options hidden if count input value is greater than 5', async () => {
       //setup
       await act(async () => renderForm(null, answer_options_form));
-
-      const testCountField = await findNumberInput(screen, 'How many times have you tested in the past?');
       const recommendationDropdown = await findSelectInput(screen, 'Testing Recommendations');
+      const testCountField = await findNumberInput(screen, 'How many times have you tested in the past?');
+      // open dropdown
       fireEvent.click(recommendationDropdown);
-
-      let perfectTestingOption = screen.getByText('Perfect testing');
-      let minimalTestingOption = screen.getByText('Minimal testing');
-      let notIdealOption = screen.getByText('Un-decisive');
-      let undeciciveOption = screen.getByText('Not ideal');
-
-      //act(() => fireEvent.blur(testCountField, { target: { value: '6' } }));
+      expect(screen.queryByRole('option', { name: /Perfect testing/i })).toBeInTheDocument();
+      expect(screen.queryByRole('option', { name: /Minimal testing/i })).toBeInTheDocument();
+      expect(screen.queryByRole('option', { name: /Un-decisive/i })).toBeInTheDocument();
+      expect(screen.queryByRole('option', { name: /Not ideal/i })).toBeInTheDocument();
+      // close dropdown
+      fireEvent.click(recommendationDropdown);
+      // provide a value greater than 5
       fireEvent.blur(testCountField, { target: { value: '6' } });
-      console.log('Event fired');
-      expect(testCountField.value).toBe('6');
-      //screen.debug();
+      // re-open dropdown
       fireEvent.click(recommendationDropdown);
+      // verify
+      expect(testCountField.value).toBe('6');
       expect(screen.queryByRole('option', { name: /Perfect testing/i })).toBeNull();
-      expect(perfectTestingOption).not.toBeInTheDocument();
-      expect(minimalTestingOption).not.toBeInTheDocument();
-      expect(notIdealOption).toBeInTheDocument();
-      expect(undeciciveOption).toBeInTheDocument();
-      //screen.debug();
+      expect(screen.queryByRole('option', { name: /Minimal testing/i })).toBeNull();
+      expect(screen.queryByRole('option', { name: /Un-decisive/i })).toBeInTheDocument();
+      expect(screen.queryByRole('option', { name: /Not ideal/i })).toBeInTheDocument();
     });
   });
 
