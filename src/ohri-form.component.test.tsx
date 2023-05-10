@@ -135,57 +135,49 @@ describe('OHRI Forms:', () => {
     it('should render dropdown with all options when test count input is empty', async () => {
       //setup
       await act(async () => renderForm(null, answer_options_form));
-      let testingRecommendation = (await screen.findByRole('group', {
-        name: /Testing Recommendations/,
-      })) as HTMLInputElement;
-      let perfectTestingField = (await screen.findByRole('radio', { name: /Perfect testing/ })) as HTMLInputElement;
-      let minimalTestingField = (await screen.findByRole('radio', { name: /Minimal testing/ })) as HTMLInputElement;
-      let notIdealField = (await screen.findByRole('radio', { name: /Not ideal/ })) as HTMLInputElement;
-      let undeciciveField = (await screen.findByRole('radio', { name: /Un-decisive/ })) as HTMLInputElement;
-
       const testCountField = await findNumberInput(screen, 'How many times have you tested in the past?');
 
-      //const recommendationDropdown = await findSelectInput(screen, 'Testing Recommendations');
+      const recommendationDropdown = await findSelectInput(screen, 'Testing Recommendations');
+      //Replay
+      fireEvent.click(recommendationDropdown);
+      let perfectTestingOption = screen.getByText('Perfect testing');
+      let minimalTestingOption = screen.getByText('Minimal testing');
+      let notIdealOption = screen.getByText('Un-decisive');
+      let undeciciveOption = screen.getByText('Not ideal');
 
       // assert initial values
       await act(async () => expect(testCountField.value).toBe(''));
-      //fireEvent.click(recommendationDropdown);
-      expect(testingRecommendation.value).toBe(undefined);
-      expect(perfectTestingField).toBeInTheDocument();
-      expect(minimalTestingField).toBeInTheDocument();
-      expect(notIdealField).toBeInTheDocument();
-      expect(undeciciveField).toBeInTheDocument();
-
-      // expect(screen.getByText('Perfect testing')).toBeInTheDocument();
-      // expect(screen.getByText('Minimal testing')).toBeInTheDocument();
-      // expect(screen.getByText('Un-decisive')).toBeInTheDocument();
-      // expect(screen.getByText('Not ideal')).toBeInTheDocument();
+      expect(perfectTestingOption).toBeInTheDocument();
+      expect(minimalTestingOption).toBeInTheDocument();
+      expect(notIdealOption).toBeInTheDocument();
+      expect(undeciciveOption).toBeInTheDocument();
     });
 
     fit('should render dropdown with with 2 options hidden if count input value is greater than 5', async () => {
       //setup
       await act(async () => renderForm(null, answer_options_form));
-      let testingRecommendation = (await screen.findByRole('group', {
-        name: /Testing Recommendations/,
-      })) as HTMLInputElement;
-      let perfectTestingField = (await screen.findByRole('radio', { name: /Perfect testing/ })) as HTMLInputElement;
-      let minimalTestingField = (await screen.findByRole('radio', { name: /Minimal testing/ })) as HTMLInputElement;
-      let notIdealField = (await screen.findByRole('radio', { name: /Not ideal/ })) as HTMLInputElement;
-      let undeciciveField = (await screen.findByRole('radio', { name: /Un-decisive/ })) as HTMLInputElement;
 
       const testCountField = await findNumberInput(screen, 'How many times have you tested in the past?');
-      //const recommendationDropdown = await findSelectInput(screen, 'Testing Recommendations');
+      const recommendationDropdown = await findSelectInput(screen, 'Testing Recommendations');
+      fireEvent.click(recommendationDropdown);
 
-      act(() => fireEvent.blur(testCountField, { target: { value: '6' } }));
-      perfectTestingField = (await screen.findByRole('radio', { name: /Perfect testing/ })) as HTMLInputElement;
+      let perfectTestingOption = screen.getByText('Perfect testing');
+      let minimalTestingOption = screen.getByText('Minimal testing');
+      let notIdealOption = screen.getByText('Un-decisive');
+      let undeciciveOption = screen.getByText('Not ideal');
+
+      //act(() => fireEvent.blur(testCountField, { target: { value: '6' } }));
+      fireEvent.blur(testCountField, { target: { value: '6' } });
       console.log('Event fired');
       expect(testCountField.value).toBe('6');
-      //fireEvent.click(recommendationDropdown);
       //screen.debug();
-      //console.log({ perfectTestingField });
-      expect(testingRecommendation.value).toBe(undefined);
-      await act(async () => expect(perfectTestingField).not.toBeInTheDocument());
-      expect(minimalTestingField).not.toBeInTheDocument();
+      fireEvent.click(recommendationDropdown);
+      expect(screen.queryByRole('option', { name: /Perfect testing/i })).toBeNull();
+      expect(perfectTestingOption).not.toBeInTheDocument();
+      expect(minimalTestingOption).not.toBeInTheDocument();
+      expect(notIdealOption).toBeInTheDocument();
+      expect(undeciciveOption).toBeInTheDocument();
+      //screen.debug();
     });
   });
 

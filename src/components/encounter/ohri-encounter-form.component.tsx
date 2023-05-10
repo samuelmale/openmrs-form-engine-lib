@@ -467,10 +467,12 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
       value = value ? ConceptTrue : ConceptFalse;
     }
     if (field.fieldDependants) {
+      console.log(field.fieldDependants);
       field.fieldDependants.forEach(dep => {
         const dependant = fields.find(f => f.id == dep);
+        console.log({ dependant, field, fields });
         // evaluate calculated value
-        if (!dependant.isHidden && dependant.questionOptions.calculate?.calculateExpression) {
+        if (!dependant?.isHidden && dependant?.questionOptions.calculate?.calculateExpression) {
           evaluateAsyncExpression(
             dependant.questionOptions.calculate.calculateExpression,
             { value: dependant, type: 'field' },
@@ -488,27 +490,18 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
           });
         }
         // evaluate hide
-        if (dependant.hide) {
+        if (dependant?.hide) {
           evalHide({ value: dependant, type: 'field' }, fields, { ...values, [fieldName]: value });
           voidObsValueOnFieldHidden(dependant, obsGroupsToVoid, setFieldValue);
         }
-        dependant.questionOptions.answers
+        dependant?.questionOptions.answers
           ?.filter(answer => answer.hide || answer.hide?.hideWhenExpression)
           .forEach(answer => {
-            answer.isHidden = evaluateExpression(
-              answer.hide.hideWhenExpression,
-              { value: dependant, type: 'field' },
-              fields,
-              values,
-              {
-                mode: sessionMode,
-                patient,
-              },
-            );
+            evalHide({ value: answer, type: 'field' }, fields, { ...values, [fieldName]: value });
           });
 
         // evaluate readonly
-        if (!dependant.isHidden && dependant['readonlyExpression']) {
+        if (!dependant?.isHidden && dependant['readonlyExpression']) {
           dependant.readonly = evaluateExpression(
             dependant['readonlyExpression'],
             { value: dependant, type: 'field' },

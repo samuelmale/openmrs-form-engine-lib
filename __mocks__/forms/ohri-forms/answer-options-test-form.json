@@ -34,7 +34,7 @@
               "id": "recommendation",
               "questionOptions": {
                 "concept": "efc87cd5-2fd8-411c-ba52-b0d858f541e7",
-                "rendering": "radio",
+                "rendering": "select",
                 "answers": [
                   {
                     "concept": "160036AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
