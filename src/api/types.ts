@@ -301,7 +301,7 @@ export interface DataSource<T> {
   /**
    * Fetches arbitrary data from a data source
    */
-  fetchData(): Promise<Array<T>>;
+  fetchData(question: OHRIFormField, searchTerm?: string): Promise<Array<T>>;
   /**
    * Maps a data source item to an object with a uuid and display property
    */
