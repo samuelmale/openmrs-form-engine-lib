@@ -200,6 +200,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
                 {
                   mode: sessionMode,
                   patient,
+                  previousEncounter,
                 },
               );
             });
@@ -214,6 +215,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
               {
                 mode: sessionMode,
                 patient,
+                previousEncounter,
               },
             );
           }
@@ -227,6 +229,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
               {
                 mode: sessionMode,
                 patient,
+                previousEncounter,
               },
             );
           }
@@ -274,7 +277,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
         setIsFieldInitializationComplete(true);
       }
     }
-  }, [tempInitialValues, concepts]);
+  }, [tempInitialValues, concepts, previousEncounter]);
 
   useEffect(() => {
     if (sessionMode == 'enter' && !isTrue(formJson.formOptions?.usePreviousValueDisabled)) {
@@ -298,6 +301,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
     const isHidden = evaluateExpression(value['hide']?.hideWhenExpression, node, allFields, allValues, {
       mode: sessionMode,
       patient,
+      previousEncounter,
     });
     node.value.isHidden = isHidden;
     if (type == 'field' && node.value?.questions?.length) {
@@ -533,6 +537,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
             {
               mode: sessionMode,
               patient,
+              previousEncounter,
             },
           ).then(result => {
             result = isEmpty(result) ? '' : result;
@@ -557,6 +562,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
               {
                 mode: sessionMode,
                 patient,
+                previousEncounter,
               },
             );
           });
@@ -570,6 +576,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
             {
               mode: sessionMode,
               patient,
+              previousEncounter,
             },
           );
         }
@@ -586,6 +593,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
             {
               mode: sessionMode,
               patient,
+              previousEncounter,
             },
           );
           ({
@@ -597,6 +605,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
               {
                 mode: sessionMode,
                 patient,
+                previousEncounter,
               },
             ),
           });

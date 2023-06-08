@@ -111,6 +111,7 @@ export const OHRIRepeat: React.FC<OHRIFormFieldProps> = ({ question, onChange })
         q.isHidden = evaluateExpression(updatedExpression, { value: q, type: 'field' }, fields, values, {
           mode: encounterContext.sessionMode,
           patient: encounterContext.patient,
+          previousEncounter: encounterContext.previousEncounter,
         });
       }
 
@@ -139,6 +140,7 @@ export const OHRIRepeat: React.FC<OHRIFormFieldProps> = ({ question, onChange })
         const result = evaluateExpression(updatedExpression, { value: q, type: 'field' }, fields, values, {
           mode: encounterContext.sessionMode,
           patient: encounterContext.patient,
+          previousEncounter: encounterContext.previousEncounter,
         });
         if (!isEmpty(result)) {
           values[q.id] = result;

@@ -1,4 +1,4 @@
-import { OHRIFormField, OHRIFormPage, OHRIFormSection } from '../api/types';
+import { OHRIFormField, OHRIFormPage, OHRIFormSection, OpenmrsEncounter } from '../api/types';
 import { CommonExpressionHelpers } from './common-expression-helpers';
 import { findAndRegisterReferencedFields, linkReferencedFieldValues, parseExpression } from './expression-parser';
 
@@ -7,10 +7,11 @@ export interface FormNode {
   type: 'field' | 'page' | 'section';
 }
 
-export interface ExpressionContext {
+export interface ExpressionRunnerContext {
   mode: 'enter' | 'edit' | 'view';
-  myValue?: any;
   patient: any;
+  myValue?: any;
+  previousEncounter: OpenmrsEncounter;
 }
 
 export function evaluateExpression(
@@ -18,7 +19,7 @@ export function evaluateExpression(
   node: FormNode,
   fields: Array<OHRIFormField>,
   fieldValues: Record<string, any>,
-  context: ExpressionContext,
+  context: ExpressionRunnerContext,
 ): any {
   if (!expression?.trim()) {
     return null;
@@ -28,7 +29,7 @@ export function evaluateExpression(
   // register dependencies
   findAndRegisterReferencedFields(node, parts, fields);
   // setup function scope
-  let { mode, myValue, patient } = context;
+  let { mode, myValue, patient, previousEncounter } = context;
   const { sex, age } = patient && 'sex' in patient && 'age' in patient ? patient : { sex: undefined, age: undefined };
 
   if (node.type === 'field' && myValue === undefined) {
@@ -74,7 +75,7 @@ export async function evaluateAsyncExpression(
   node: FormNode,
   fields: Array<OHRIFormField>,
   fieldValues: Record<string, any>,
-  context: ExpressionContext,
+  context: ExpressionRunnerContext,
 ): Promise<any> {
   if (!expression?.trim()) {
     return null;
@@ -84,7 +85,7 @@ export async function evaluateAsyncExpression(
   // register dependencies
   findAndRegisterReferencedFields(node, parts, fields);
   // setup function scope
-  let { mode, myValue, patient } = context;
+  let { mode, myValue, patient, previousEncounter } = context;
   const { sex, age } = patient && 'sex' in patient && 'age' in patient ? patient : { sex: undefined, age: undefined };
   if (node.type === 'field' && myValue === undefined) {
     myValue = fieldValues[node.value['id']];

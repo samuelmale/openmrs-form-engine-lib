@@ -62,6 +62,7 @@ export function useInitialValues(
             {
               mode: encounterContext.sessionMode,
               patient: encounterContext.patient,
+              previousEncounter: null,
             },
           );
         }

@@ -1,12 +1,12 @@
 import { FieldValidator, OHRIFormField } from '../api/types';
-import { evaluateExpression, ExpressionContext } from '../utils/expression-runner';
+import { evaluateExpression, ExpressionRunnerContext } from '../utils/expression-runner';
 
 interface JSExpressionValidatorConfig {
   failsWhenExpression?: string;
   warnsWhenExpression?: string;
   message: string;
   fields: OHRIFormField[];
-  expressionContext: ExpressionContext;
+  expressionRunnerContext: ExpressionRunnerContext;
   values: Record<string, any>;
 }
 
@@ -15,7 +15,7 @@ export const OHRIJSExpressionValidator: FieldValidator = {
     const INVALID_VALUE_ERR_CODE = 'value.invalid';
     const INVALID_VALUE_ERR_MESSAGE = 'Invalid value';
     const FIELD_HAS_WARNINGS_MESSAGE = 'Field has warnings';
-    config.expressionContext.myValue = value;
+    config.expressionRunnerContext.myValue = value;
     return Object.keys(config)
       .filter(key => key == 'failsWhenExpression' || key == 'warnsWhenExpression')
       .flatMap(key => {
@@ -25,7 +25,7 @@ export const OHRIJSExpressionValidator: FieldValidator = {
           { value: field, type: 'field' },
           config.fields,
           { ...config.values, [field.id]: value },
-          config.expressionContext,
+          config.expressionRunnerContext,
         )
           ? [
               {

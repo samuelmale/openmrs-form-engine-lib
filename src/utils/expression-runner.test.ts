@@ -2,7 +2,7 @@ import { OHRIFormField } from '../api/types';
 import { ConceptFalse } from '../constants';
 import { CommonExpressionHelpers } from './common-expression-helpers';
 import { parseExpression } from './expression-parser';
-import { checkReferenceToResolvedFragment, evaluateExpression, ExpressionContext } from './expression-runner';
+import { checkReferenceToResolvedFragment, evaluateExpression, ExpressionRunnerContext } from './expression-runner';
 
 export const testFields: Array<OHRIFormField> = [
   {
@@ -81,7 +81,7 @@ export const testFields: Array<OHRIFormField> = [
 ];
 
 describe('Common expression runner - evaluateExpression', () => {
-  const context: ExpressionContext = { mode: 'enter', patient: {} };
+  const context: ExpressionRunnerContext = { mode: 'enter', patient: {}, previousEncounter: null };
   const allFields = JSON.parse(JSON.stringify(testFields));
   let valuesMap = {
     linkedToCare: '',

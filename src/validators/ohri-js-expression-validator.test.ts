@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { OHRIFormField } from '../api/types';
-import { ExpressionContext } from '../utils/expression-runner';
+import { ExpressionRunnerContext } from '../utils/expression-runner';
 import { testFields } from '../utils/expression-runner.test';
 import { OHRIJSExpressionValidator } from './ohri-js-expression-validator';
 
@@ -15,7 +15,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
     bodyTemperature: 0,
     testDate: null,
   };
-  const expressionContext: ExpressionContext = { mode: 'enter', patient: {} };
+  const expressionRunnerContext: ExpressionRunnerContext = { mode: 'enter', patient: {}, previousEncounter: null };
 
   it('should evaluate js expressions', () => {
     // setup
@@ -25,7 +25,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
     // replay
     let errors = OHRIJSExpressionValidator.validate(field, 'Remarks..', {
       failsWhenExpression,
-      expressionContext,
+      expressionRunnerContext,
       values,
       message: 'Atleast one type of Prevention Services must be selected',
       fields: allFields,
@@ -46,7 +46,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
     // replay
     errors = OHRIJSExpressionValidator.validate(field, 'Remarks..', {
       failsWhenExpression,
-      expressionContext,
+      expressionRunnerContext,
       values,
       message: 'Atleast one type of Prevention Services must be selected',
       fields: allFields,
@@ -79,7 +79,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
     // replay
     let errors = OHRIJSExpressionValidator.validate(dateField, dayjs('2020-11-13', 'YYYY-MM-DD', true).toDate(), {
       ...dateField.validators[0],
-      expressionContext,
+      expressionRunnerContext,
       values,
       fields: allFields,
     });
@@ -94,7 +94,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
     futureDate.setDate(futureDate.getDate() + 10);
     errors = OHRIJSExpressionValidator.validate(dateField, futureDate, {
       ...dateField.validators[0],
-      expressionContext,
+      expressionRunnerContext,
       values,
       fields: allFields,
     });
@@ -107,7 +107,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
     // replay
     errors = OHRIJSExpressionValidator.validate(dateField, dayjs('2021-11-12', 'YYYY-MM-DD', true).toDate(), {
       ...dateField.validators[0],
-      expressionContext,
+      expressionRunnerContext,
       values,
       fields: allFields,
     });
