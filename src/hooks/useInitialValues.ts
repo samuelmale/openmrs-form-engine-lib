@@ -53,7 +53,7 @@ export function useInitialValues(
       formFields
         .filter(field => isEmpty(field.value))
         .forEach(field => {
-          if (field.questionOptions.rendering == 'repeating') {
+          if (field.questionOptions.rendering === 'repeating') {
             !field.questionOptions.repeatOptions?.isCloned && repeatableFields.push(field);
             return;
           }
@@ -71,6 +71,7 @@ export function useInitialValues(
         });
       const flatenedFields = repeatableFields.flatMap(field => {
         let counter = 1;
+        const handler = getHandler(field.type);
         const unMappedGroups = encounter.obs.filter(
           obs =>
             obs.concept.uuid === field.questionOptions.concept &&
@@ -79,6 +80,15 @@ export function useInitialValues(
         );
         return unMappedGroups.flatMap(group => {
           const clone = cloneObsGroup(field, group, counter++, initialValues);
+
+          console.log({
+            initVal: handler.getInitialValue({ obs: [group] }, clone.questions[0], formFields),
+            field: clone.questions[0],
+            clone,
+            group,
+            initialValues,
+          });
+
           assignedObsIds.push(group.uuid);
           return [clone, ...clone.questions];
         });

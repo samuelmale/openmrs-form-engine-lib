@@ -20,12 +20,13 @@ export function cloneObsGroup(
     childField.id = `${childField.id}_${idSuffix}`;
     childField['groupId'] = clonedField.id;
     childField.value = null;
-    const initialValue = obsGroup ? getInitialValueFromObs(childField, obsGroup) : null;
-    allFieldValues[`${childField.id}`] = initialValue
-      ? initialValue
-      : childField.questionOptions.rendering == 'checkbox'
-      ? []
-      : '';
+    // const initialValue = obsGroup ? getInitialValueFromObs(childField, obsGroup) : null;
+    // console.log({ initialValue, srcField });
+    // allFieldValues[`${childField.id}`] = initialValue
+    //   ? initialValue
+    //   : childField.questionOptions.rendering == 'checkbox'
+    //   ? []
+    //   : '';
 
     // cleanup expressions
 
