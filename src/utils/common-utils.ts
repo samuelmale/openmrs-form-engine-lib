@@ -1,4 +1,4 @@
-import { OpenmrsObs } from '../api/types';
+import { OHRIFormField, OpenmrsObs, RenderType } from '../api/types';
 
 export function flattenObsList(obsList: OpenmrsObs[]): OpenmrsObs[] {
   const flattenedList: OpenmrsObs[] = [];
@@ -17,4 +17,8 @@ export function flattenObsList(obsList: OpenmrsObs[]): OpenmrsObs[] {
   });
 
   return flattenedList;
+}
+
+export function hasRendering(field: OHRIFormField, rendering: RenderType) {
+  return field.questionOptions.rendering === rendering;
 }

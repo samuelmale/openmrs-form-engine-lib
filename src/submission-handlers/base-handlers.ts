@@ -4,7 +4,7 @@ import { ConceptTrue } from '../constants';
 import { EncounterContext } from '../ohri-form-context';
 import { OHRIFormField, OpenmrsEncounter, OpenmrsObs, SubmissionHandler } from '../api/types';
 import { parseToLocalDateTime } from '../utils/ohri-form-helper';
-import { flattenObsList } from '../utils/common-utils';
+import { flattenObsList, hasRendering } from '../utils/common-utils';
 
 // Temporarily holds observations that have already been binded with matching fields
 export let assignedObsIds: string[] = [];
@@ -44,26 +44,18 @@ export const ObsSubmissionHandler: SubmissionHandler = {
     return field.value;
   },
   getInitialValue: (encounter: OpenmrsEncounter, field: OHRIFormField, allFormFields: Array<OHRIFormField>) => {
-    let obs = findObsByFormField(flattenObsList(encounter.obs), assignedObsIds, field);
+    const obs = findObsByFormField(flattenObsList(encounter.obs), assignedObsIds, field);
     const rendering = field.questionOptions.rendering;
-    let parentField = null;
     let obsGroup = null;
-    if (field.id === 'date_of_birth_1') {
-      console.log({ obs, encObsList: flattenObsList(encounter.obs), display: encounter.obs[0].display });
-    }
-    // if (!obs && field['groupId']) {
-    //   parentField = allFormFields.find(f => f.id == field['groupId']);
-    //   obsGroup = findObsByFormField(encounter.obs, null, parentField);
-    //   if (obsGroup) {
-    //     assignedObsIds.push(obsGroup.uuid);
-    //     parentField.value = obsGroup;
-    //     if (obsGroup.groupMembers) {
-    //       obs = findObsByFormField(obsGroup.groupMembers, assignedObsIds, field);
-    //     }
-    //   }
-    // }
-    if (obs) {
-      assignedObsIds.push(obs.uuid);
+
+    if (obs?.length) {
+      const obsValue = rendering === 'checkbox' ? obs : obs[0];
+      // assignedObsIds.push(render ? ...obs.map(obs => obs.uuid))
+      assignedObsIds.push(rendering === 'checkbox' ? ...obs.map(obs => obs.uuid) : obs[0].uuid);
+      if (field['groupId'] && !assignedObsIds.includes(obs.obsGroup?.uuid)) {
+        assignedObsIds.push(obs.obsGroup?.uuid);
+      }
+      if (rendering)
       field.value = JSON.parse(JSON.stringify(obs));
       if (rendering == 'radio' || rendering == 'content-switcher') {
         getConcept(field.questionOptions.concept, 'custom:(uuid,display,datatype:(uuid,display,name))').subscribe(
@@ -75,21 +67,21 @@ export const ObsSubmissionHandler: SubmissionHandler = {
         );
       }
       if (typeof obs.value == 'string' || typeof obs.value == 'number') {
-        if (field.questionOptions.rendering.startsWith('date')) {
+        if (rendering.startsWith('date')) {
           const dateObject = parseToLocalDateTime(field.value.value);
           field.value.value = dayjs(dateObject).format('YYYY-MM-DD HH:mm');
           return dateObject;
         }
         return obs.value;
       }
-      if (field.questionOptions.rendering == 'checkbox') {
+      if (rendering == 'checkbox') {
         field.value = encounter.obs.filter(o => o.concept.uuid == field.questionOptions.concept);
         if (!field.value.length && field['groupId']) {
           field.value = obsGroup.groupMembers.filter(o => o.concept.uuid == field.questionOptions.concept);
         }
         return field.value.map(o => o.value.uuid);
       }
-      if (field.questionOptions.rendering == 'toggle') {
+      if (rendering == 'toggle') {
         field.value.value = obs.value.uuid;
         return obs.value == ConceptTrue;
       }
@@ -189,6 +181,9 @@ const constructObs = (value: any, context: EncounterContext, field: OHRIFormFiel
     order: null,
     groupMembers: [],
     voided: false,
+    // TODO: Update form path to:
+    // 1. Follow standard patterns ie. NAMESPACE + "^" + FORMFIELD_PATH
+    // 2. Remove "ohri" from the namespace
     formFieldNamespace: 'ohri-forms',
     formFieldPath: `ohri-forms-${field.id}`,
     value: value,
@@ -196,28 +191,23 @@ const constructObs = (value: any, context: EncounterContext, field: OHRIFormFiel
 };
 
 /**
- * Looks up target Obs for a specific field in the`obsList`.
+ * Retrieves a list of observations from the `obsList` that correspond to the specified field.
  *
- * If `claimedObsIds` is provided, it will be used to filter
- * out all previously assigned observations basing list content.
+ * Notes:
+ * If the query by field-path returns an empty list, the function falls back to querying
+ * by concept and uses `claimedObsIds` to exclude already assigned observations.
  */
 export const findObsByFormField = (
   obsList: Array<OpenmrsObs>,
   claimedObsIds: string[],
   field: OHRIFormField,
-): OpenmrsObs => {
-  if (field.id === 'infant_details') {
-    console.log({ obsList, forFieldPath: `ohri-forms-${field.id}` });
-  }
-  const obs = obsList.find(o => o.formFieldPath == `ohri-forms-${field.id}`);
+): OpenmrsObs[] => {
+  const obs = obsList.filter(o => o.formFieldPath == `ohri-forms-${field.id}`);
   // We shall fall back to mapping by the associated concept
   // That being said, we shall find all matching obs and pick the one that wasn't previously claimed.
-  if (!obs) {
-    const assignableObsOptions = obsList.filter(obs => obs.concept.uuid == field.questionOptions.concept);
-    // return the first occurrance of an unclaimed observation
-    return claimedObsIds?.length
-      ? assignableObsOptions.filter(obs => !claimedObsIds.includes(obs.uuid))[0]
-      : assignableObsOptions[0];
+  if (!obs?.length) {
+    const obsByConcept = obsList.filter(obs => obs.concept.uuid == field.questionOptions.concept);
+    return claimedObsIds?.length ? obsByConcept.filter(obs => !claimedObsIds.includes(obs.uuid)) : obsByConcept;
   }
   return obs;
 };
