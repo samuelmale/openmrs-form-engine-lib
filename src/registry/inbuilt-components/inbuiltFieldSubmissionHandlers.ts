@@ -7,6 +7,7 @@ import { ControlHandler } from '../../submission-handlers/controlHandler';
 import { type RegistryItem } from '../registry';
 import { TestOrderSubmissionHandler } from '../../submission-handlers/testOrderHandler';
 import { ObsSubmissionHandler } from '../../submission-handlers/obsHandler';
+import { ProgramStateHandler } from '../../submission-handlers/programStateHandler';
 
 /**
  * @internal
@@ -51,5 +52,10 @@ export const inbuiltFieldSubmissionHandlers: Array<RegistryItem<SubmissionHandle
     name: 'TestOrderSubmissionHandler',
     component: TestOrderSubmissionHandler,
     type: 'testOrder',
+  },
+  {
+    name: 'ProgramStateHandler',
+    component: ProgramStateHandler,
+    type: 'programState',
   },
 ];

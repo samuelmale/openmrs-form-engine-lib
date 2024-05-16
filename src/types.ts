@@ -239,6 +239,8 @@ export interface FormQuestionOptions {
   orderSettingUuid?: string;
   orderType?: string;
   selectableOrders?: Array<Record<any, any>>;
+  programUuid?: string;
+  workFlowUuid?: string;
 }
 
 export type SessionMode = 'edit' | 'enter' | 'view' | 'embedded-view';
@@ -384,12 +386,22 @@ export type RepeatObsGroupCounter = {
 };
 
 export interface ProgramEnrollmentPayload {
-  patient: string;
-  program: string;
+  patient?: string;
+  program?: string;
   dateEnrolled: string;
   dateCompleted?: string;
   location: string;
+  states?: Array<ProgramState>,
+  uuid?: string;
 }
+
+export interface ProgramState {
+  state: string;
+  name?: string;
+  startDate?: string;
+  endDate?: string;
+  retired?: boolean;
+ }
 
 export interface PatientIdentifier {
   uuid?: string;
@@ -426,4 +438,29 @@ export interface Order {
   patient?: string;
   orderNumber?: string;
   voided?: boolean;
+}
+
+export interface PatientProgram {
+  uuid: string;
+  display: string;
+  patient?: OpenmrsResource;
+  program?: OpenmrsResource;
+  dateEnrolled: string;
+  dateCompleted?: string;
+  location: OpenmrsResource;
+  states?: Array<ProgramWorkflowState>;
+}
+
+export interface ProgramWorkflowState {
+  state: {
+    uuid: string;
+    concept: {
+      uuid: string;
+    },
+    programWorkflow: {
+      uuid: string;
+    },
+    retired: boolean;
+    name: string;
+  }
 }
