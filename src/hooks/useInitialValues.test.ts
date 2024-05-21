@@ -159,6 +159,7 @@ describe('useInitialValues', () => {
         useInitialValues(
           [...allFormFields],
           null,
+          false,
           {
             encounter: null,
             patient: testPatient,
@@ -195,6 +196,7 @@ describe('useInitialValues', () => {
         useInitialValues(
           [...allFormFields],
           encounter,
+          false,
           {
             encounter: encounter,
             patient: testPatient,
@@ -255,6 +257,7 @@ describe('useInitialValues', () => {
         useInitialValues(
           [...allFormFields],
           null,
+          false,
           {
             encounter: undefined,
             patient: testPatient,
@@ -293,6 +296,7 @@ describe('useInitialValues', () => {
         useInitialValues(
           [testOrder],
           encounter,
+          false,
           {
             encounter: encounter,
             patient: testPatient,

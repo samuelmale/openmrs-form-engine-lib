@@ -15,7 +15,7 @@ import { useFieldValidationResults } from '../../../hooks/useFieldValidationResu
 const Dropdown: React.FC<FormFieldProps> = ({ question, onChange, handler, previousValue }) => {
   const { t } = useTranslation();
   const [field, meta] = useField(question.id);
-  const { setFieldValue, encounterContext, layoutType, workspaceLayout } = React.useContext(FormContext);
+  const { setFieldValue, encounterContext, layoutType, workspaceLayout, values } = React.useContext(FormContext);
   const { errors, warnings, setErrors, setWarnings } = useFieldValidationResults(question);
 
   const handleChange = (value) => {

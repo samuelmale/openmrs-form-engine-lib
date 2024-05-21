@@ -83,6 +83,7 @@ export interface FormSchema {
   };
   version?: string;
   translations?: Record<string, string>;
+  meta: Record<string, any>;
 }
 
 export interface FormPage {
@@ -240,7 +241,7 @@ export interface FormQuestionOptions {
   orderType?: string;
   selectableOrders?: Array<Record<any, any>>;
   programUuid?: string;
-  workFlowUuid?: string;
+  workflowUuid?: string;
 }
 
 export type SessionMode = 'edit' | 'enter' | 'view' | 'embedded-view';
@@ -385,24 +386,6 @@ export type RepeatObsGroupCounter = {
   limit?: number;
 };
 
-export interface ProgramEnrollmentPayload {
-  patient?: string;
-  program?: string;
-  dateEnrolled: string;
-  dateCompleted?: string;
-  location: string;
-  states?: Array<ProgramState>,
-  uuid?: string;
-}
-
-export interface ProgramState {
-  state: string;
-  name?: string;
-  startDate?: string;
-  endDate?: string;
-  retired?: boolean;
- }
-
 export interface PatientIdentifier {
   uuid?: string;
   identifier: string;
@@ -440,27 +423,42 @@ export interface Order {
   voided?: boolean;
 }
 
-export interface PatientProgram {
-  uuid: string;
-  display: string;
-  patient?: OpenmrsResource;
-  program?: OpenmrsResource;
-  dateEnrolled: string;
-  dateCompleted?: string;
-  location: OpenmrsResource;
-  states?: Array<ProgramWorkflowState>;
+export interface ProgramState {
+  name?: string;
+  startDate?: string;
+  uuid?: string;
+  concept: OpenmrsResource;
+  programWorkflow: OpenmrsResource;
 }
 
 export interface ProgramWorkflowState {
-  state: {
-    uuid: string;
-    concept: {
-      uuid: string;
-    },
-    programWorkflow: {
-      uuid: string;
-    },
-    retired: boolean;
-    name: string;
-  }
+  state: ProgramState;
+  endDate?: string;
+  startDate?: string;
+}
+
+export interface PatientProgram {
+  uuid?: string;
+  display?: string;
+  patient?: string;
+  program?: OpenmrsResource;
+  dateEnrolled?: string;
+  dateCompleted?: string;
+  location?: string;
+  states?: Array<ProgramWorkflowState>;
+}
+
+export interface PatientProgramPayload {
+  program?: string;
+  uuid?: string;
+  display?: string;
+  patient?: string;
+  dateEnrolled?: string;
+  dateCompleted?: string;
+  location?: string;
+  states?: Array<{
+    state?: string;
+    startDate?: string;
+    endDate?: string;
+  }>;
 }

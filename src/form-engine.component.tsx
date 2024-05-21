@@ -230,6 +230,7 @@ const FormEngine: React.FC<FormProps> = ({
         })
         .catch((error) => {
           setIsSubmitting(false);
+          showSnackbar(error);
         })
         .finally(() => {
           setIsSubmitting(false);
