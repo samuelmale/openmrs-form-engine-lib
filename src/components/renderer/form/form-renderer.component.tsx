@@ -9,6 +9,7 @@ import { FormProvider, type FormContextProps } from '../../../provider/form-prov
 import { isTrue } from '../../../utils/boolean-utils';
 import { type FormProcessorContextProps } from '../../../types';
 import { useFormStateHelpers } from '../../../hooks/useFormStateHelpers';
+import { pageObserver } from '../../sidebar/page-observer';
 
 export type FormRendererProps = {
   processorContext: FormProcessorContextProps;
@@ -49,6 +50,11 @@ export const FormRenderer = ({
     removeInvalidField,
     setForm,
   } = useFormStateHelpers(dispatch, formFields);
+
+  useEffect(() => {
+    const scrollablePages = formJson.pages.filter((page) => !page.isSubform).map((page) => page);
+    pageObserver.updateScrollablePages(scrollablePages);
+  }, [formJson.pages]);
 
   const context: FormContextProps = useMemo(() => {
     return {

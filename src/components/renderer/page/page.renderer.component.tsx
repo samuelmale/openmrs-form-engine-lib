@@ -6,8 +6,8 @@ import { SectionRenderer } from '../section/section-renderer.component';
 import { Waypoint } from 'react-waypoint';
 import styles from './page.renderer.scss';
 import { Accordion, AccordionItem } from '@carbon/react';
-import { useFormFactory } from '../../../provider/form-factory-provider';
 import { ChevronDownIcon, ChevronUpIcon } from '@openmrs/esm-framework';
+import { pageObserver } from '../../sidebar/page-observer';
 
 interface PageRendererProps {
   page: FormPage;
@@ -15,10 +15,8 @@ interface PageRendererProps {
 
 function PageRenderer({ page }: PageRendererProps) {
   const { t } = useTranslation();
-  const pageId = useMemo(() => page.label.replace(/\s/g, ''), [page.label]);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const { setCurrentPage } = useFormFactory();
   const visibleSections = page.sections.filter((section) => {
     const hasVisibleQuestions = section.questions.some((question) => !isTrue(question.isHidden));
     return !isTrue(section.isHidden) && hasVisibleQuestions;
@@ -28,8 +26,8 @@ function PageRenderer({ page }: PageRendererProps) {
 
   return (
     <div>
-      <Waypoint onEnter={() => setCurrentPage(pageId)} topOffset="50%" bottomOffset="60%">
-        <div className={styles.pageContent}>
+      <Waypoint onEnter={() => pageObserver.setCurrentActivePage(page.id)} topOffset="50%" bottomOffset="60%">
+        <div id={page.id} className={styles.pageContent}>
           <div className={styles.pageHeader} onClick={toggleCollapse}>
             <p className={styles.pageTitle}>
               {t(page.label)}

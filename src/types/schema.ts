@@ -42,6 +42,7 @@ export interface FormPage {
     behaviours?: Array<any>;
     form: Omit<FormSchema, 'postSubmissionActions'>;
   };
+  id?: string;
 }
 
 export interface FormSection {

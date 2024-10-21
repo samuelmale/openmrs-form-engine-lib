@@ -5,7 +5,6 @@ import { isEmpty, useFormJson } from '.';
 import FormProcessorFactory from './components/processor-factory/form-processor-factory.component';
 import Loader from './components/loaders/loader.component';
 import { usePatientData } from './hooks/usePatientData';
-import { useWorkspaceLayout } from './hooks/useWorkspaceLayout';
 import { FormFactoryProvider } from './provider/form-factory-provider';
 import classNames from 'classnames';
 import styles from './form-engine.scss';
@@ -16,6 +15,8 @@ import MarkdownWrapper from './components/inputs/markdown/markdown-wrapper.compo
 import { init, teardown } from './lifecycle';
 import { reportError } from './utils/error-utils';
 import { moduleName } from './globals';
+import Sidebar from './components/sidebar/sidebar.component';
+import { useFormWorkspaceSize } from './hooks/useFormWorkspaceSize';
 
 interface FormEngineProps {
   patientUUID: string;
@@ -55,7 +56,7 @@ const FormEngine = ({
   const sessionDate = useMemo(() => {
     return new Date();
   }, []);
-  const workspaceLayout = useWorkspaceLayout(ref);
+  const workspaceSize = useFormWorkspaceSize(ref);
   const { patient, isLoadingPatient } = usePatientData(patientUUID);
   const [isLoadingDependencies, setIsLoadingDependencies] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
@@ -72,16 +73,16 @@ const FormEngine = ({
   } = useFormJson(formUUID, formJson, encounterUUID, formSessionIntent);
 
   const showPatientBanner = useMemo(() => {
-    return patient && workspaceLayout !== 'minimized' && mode !== 'embedded-view';
-  }, [patient, mode, workspaceLayout]);
+    return patient && workspaceSize === 'ultra-wide' && mode !== 'embedded-view';
+  }, [patient, mode, workspaceSize]);
 
   const showButtonSet = useMemo(() => {
-    // if (mode === 'embedded-view') {
-    //   return false;
-    // }
-    // return workspaceLayout === 'minimized' || (workspaceLayout === 'maximized' && scrollablePages.size <= 1);
-    return true;
-  }, [mode, workspaceLayout]);
+    if (mode === 'embedded-view') {
+      return false;
+    }
+
+    // return ['narrow', 'wider'].includes(workspaceSize) && scrollablePages.size <= 1);
+  }, [mode, workspaceSize]);
 
   useEffect(() => {
     reportError(formError, t('errorLoadingFormSchema', 'Error loading form schema'));
@@ -113,7 +114,7 @@ const FormEngine = ({
           sessionMode={sessionMode}
           sessionDate={sessionDate}
           formJson={refinedFormJson}
-          workspaceLayout={workspaceLayout}
+          workspaceLayout={workspaceSize === 'ultra-wide' ? 'maximized' : 'minimized'}
           location={session?.sessionLocation}
           provider={session?.currentProvider}
           visit={visit}
@@ -134,7 +135,23 @@ const FormEngine = ({
               </div>
             )}
             <div className={styles.formContent}>
-              {showSidebar && <div>{/* Side bar goes here */}</div>}
+              <Sidebar
+                defaultPage={''}
+                handleClose={handleClose}
+                hideFormCollapseToggle={function (): void {
+                  throw new Error('Function not implemented.');
+                }}
+                isFormSubmitting={false}
+                mode={mode}
+                onCancel={onCancel}
+                pagesWithErrors={[]}
+                scrollablePages={undefined}
+                selectedPage={''}
+                setValues={function (values: unknown): void {
+                  throw new Error('Function not implemented.');
+                }}
+                values={undefined}
+              />
               <div className={styles.formContentInner}>
                 {showPatientBanner && <PatientBanner patient={patient} hideActionsOverflow />}
                 {refinedFormJson.markdown && (

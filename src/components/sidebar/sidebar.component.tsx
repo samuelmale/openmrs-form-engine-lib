@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { Button, Toggle } from '@carbon/react';
-import { isEmpty } from '../../validators/form-validator';
+import { Button } from '@carbon/react';
 import { type FormPage } from '../../types';
 import styles from './sidebar.scss';
 import { scrollIntoView } from '../../utils/form-helper';
+import { pageObserver } from './page-observer';
 
 interface SidebarProps {
-  allowUnspecifiedAll: boolean;
   defaultPage: string;
   handleClose: () => void;
   hideFormCollapseToggle: () => void;
@@ -23,21 +22,38 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  allowUnspecifiedAll,
   defaultPage,
-  handleClose,
-  hideFormCollapseToggle,
   isFormSubmitting,
   mode,
-  onCancel,
   pagesWithErrors,
   scrollablePages,
-  selectedPage,
-  setValues,
-  values,
+  onCancel,
+  handleClose,
+  hideFormCollapseToggle,
 }) => {
   const { t } = useTranslation();
-  const pages: Array<FormPage> = Array.from(scrollablePages);
+  const [pages, setPages] = useState<Array<FormPage>>([]);
+  const [currentActivePage, setCurrentActivePage] = useState<string | null>(null);
+  useEffect(() => {
+    const scrollablePagesSubscription = pageObserver.getScrollablePagesObservable().subscribe((pages) => {
+      setPages(pages);
+    });
+
+    const pagesWithErrorsSubscription = pageObserver.getPagesWithErrorsObservable().subscribe((errors) => {
+      console.log('Pages with Errors:', errors);
+    });
+
+    const currentActivePageSubscription = pageObserver.getCurrentActivePageObservable().subscribe((pageId) => {
+      console.log('Current Active Page:', pageId);
+      setCurrentActivePage(pageId);
+    });
+
+    return () => {
+      scrollablePagesSubscription.unsubscribe();
+      pagesWithErrorsSubscription.unsubscribe();
+      currentActivePageSubscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (defaultPage && pages.some(({ label, isHidden }) => label === defaultPage && !isHidden)) {
@@ -45,36 +61,16 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   }, [defaultPage, scrollablePages]);
 
-  const unspecifiedFields = useMemo(
-    () =>
-      Object.keys(values).filter(
-        (key) => key.endsWith('-unspecified') && isEmpty(values[key.split('-unspecified')[0]]),
-      ),
-    [values],
-  );
-
-  const handleClick = (selected) => {
-    const activeId = joinWord(selected);
-    scrollIntoView(activeId);
+  const handleClick = (selectedPage) => {
+    scrollIntoView(selectedPage);
   };
-
-  const markAllAsUnspecified = useCallback(
-    (toggled) => {
-      const updatedValues = { ...values };
-      unspecifiedFields.forEach((field) => {
-        updatedValues[field] = toggled;
-      });
-      setValues(updatedValues);
-    },
-    [unspecifiedFields, values, setValues],
-  );
 
   return (
     <div className={styles.sidebar}>
       {pages.map((page, index) => {
         if (page.isHidden) return null;
 
-        const isCurrentlySelected = joinWord(page.label) === selectedPage;
+        const isCurrentlySelected = page.id === currentActivePage;
         const hasError = pagesWithErrors.includes(page.label);
 
         return (
@@ -87,24 +83,13 @@ const Sidebar: React.FC<SidebarProps> = ({
               [styles.section]: !isCurrentlySelected && !hasError,
             })}
             key={index}
-            onClick={() => handleClick(page.label)}>
+            onClick={() => handleClick(page.id)}>
             <div className={styles.sectionLink}>{page.label}</div>
           </div>
         );
       })}
       {mode !== 'view' && <hr className={styles.divider} />}
       <div className={styles.sidenavActions}>
-        {allowUnspecifiedAll && mode !== 'view' && (
-          <div className={styles.toggleContainer}>
-            <Toggle
-              id="auto-unspecifier"
-              labelA={t('unspecifyAll', 'Unspecify All')}
-              labelB={t('revert', 'Revert')}
-              labelText=""
-              onToggle={markAllAsUnspecified}
-            />
-          </div>
-        )}
         {mode !== 'view' && (
           <Button className={styles.saveButton} disabled={isFormSubmitting} type="submit">
             {t('save', 'Save')}

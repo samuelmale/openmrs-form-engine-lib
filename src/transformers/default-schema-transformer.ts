@@ -7,7 +7,8 @@ export type RenderTypeExtended = 'multiCheckbox' | 'numeric' | RenderType;
 export const DefaultFormSchemaTransformer: FormSchemaTransformer = {
   transform: (form: FormSchema) => {
     parseBooleanTokenIfPresent(form, 'readonly');
-    form.pages.forEach((page) => {
+    form.pages.forEach((page, index) => {
+      page.id = `page-${page.label.replace(/\s/g, '')}-${index}`;
       parseBooleanTokenIfPresent(page, 'readonly');
       if (page.sections) {
         page.sections.forEach((section) => {
